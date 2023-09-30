@@ -1,11 +1,10 @@
 import { Settings } from '../../assets/icons';
-import './WorkspaceSettings.scss';
-
+import s from './WorkspaceSettings.module.scss';
 
 export const WorkspaceSettings = () => {
   return (
-    <button className='workspace-settings'>
-      <Settings/>
+    <button className={s.workspaceSettings}>
+      <Settings />
     </button>
-  )
-}
+  );
+};
