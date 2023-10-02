@@ -1,13 +1,13 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { BoardInterface } from "../types";
+import { createSlice } from '@reduxjs/toolkit';
+import { Board } from '../store.types';
 
-const initialState: BoardInterface | Record<string, never> = {};
+// get data from local storage
+const initialState: Board | Record<string, never> = {};
 
 export const boardSlice = createSlice({
-  name: "board",
+  name: 'board',
   initialState,
   reducers: {},
-})
+});
 
-
-export const { } = boardSlice.actions;
+export const {} = boardSlice.actions;
