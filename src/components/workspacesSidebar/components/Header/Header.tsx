@@ -10,8 +10,9 @@ import {
 } from '../../../../store/slices/workspacesSlice';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import type { Workspace } from '../../../../store/store.types';
+import type { Board, Workspace } from '../../../../store/store.types';
 import clsx from 'clsx';
+import { setActiveWorkspace } from '../../../../store/slices';
 
 export const Header = () => {
   const [editing, setEditing] = useState(false);
@@ -19,6 +20,9 @@ export const Header = () => {
   const dispatch = useDispatch();
   const workspaces = useSelector<RootState, Workspace[]>(
     (state) => state.workspaces
+  );
+  const activeWorkspace = useSelector<RootState, Board['activeWorkspace']>(
+    (state) => state.board.activeWorkspace
   );
 
   const editedWorkspace = workspaces.find(
@@ -59,6 +63,10 @@ export const Header = () => {
     dispatch(editWorkspace(id));
   };
 
+  const handleWorkspaceClick = (id: string) => {
+    dispatch(setActiveWorkspace(id));
+  };
+
   useEffect(() => {
     if (editedWorkspace) {
       setEditing(true);
@@ -74,9 +82,11 @@ export const Header = () => {
         {workspaces.map(({ id, name, edited, disabled }) => (
           <li key={id}>
             <WorkspaceCard
+              active={id === activeWorkspace}
               name={name}
               edited={edited}
               disabled={disabled}
+              onClick={() => handleWorkspaceClick(id)}
               onInput={handleInputChange}
               onDelete={() => handleDeleteWorkspace(id)}
               onEdit={() => handleEditClick(id)}

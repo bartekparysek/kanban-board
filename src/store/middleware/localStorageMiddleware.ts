@@ -10,7 +10,9 @@ import {
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export const localStorageMiddleware = createListenerMiddleware();
-import { WORKSPACES_KEY } from '../../config';
+import { BOARD_KEY, GROUPS_KEY, WORKSPACES_KEY } from '../../config';
+import { setActiveWorkspace } from '../slices/boardSlice';
+import { createGroup, deleteGroup, editGroupName } from '../slices/groupsSlice';
 
 localStorageMiddleware.startListening as AppStartListening;
 localStorageMiddleware.startListening({
@@ -20,9 +22,27 @@ localStorageMiddleware.startListening({
     deleteWorkspace,
     editWorkspace
   ),
-  effect: async (_, { getState }) => {
+  effect: (_, { getState }) => {
     const { workspaces } = getState() as RootState;
 
     localStorage.setItem(WORKSPACES_KEY, JSON.stringify(workspaces));
+  },
+}) as unknown as AppStartListening;
+
+localStorageMiddleware.startListening({
+  actionCreator: setActiveWorkspace,
+  effect: (_, { getState }) => {
+    const { board } = getState() as RootState;
+
+    localStorage.setItem(BOARD_KEY, JSON.stringify(board));
+  },
+}) as unknown as AppStartListening;
+
+localStorageMiddleware.startListening({
+  matcher: isAnyOf(createGroup, deleteGroup, editGroupName),
+  effect: (_, { getState }) => {
+    const { groups } = getState() as RootState;
+
+    localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
   },
 }) as unknown as AppStartListening;

@@ -1,10 +1,16 @@
 export type Board = {
-  groups: [];
+  activeWorkspace?: string;
+  groups?: [];
 };
 
 export type Group = {
+  id: string;
   name: string;
-  cards: Card[];
+  cards?: Card[];
+};
+
+export type Groups = {
+  [key: string]: Group[];
 };
 
 export type Card = {

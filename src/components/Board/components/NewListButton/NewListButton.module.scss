@@ -1,0 +1,39 @@
+
+.wrapper {
+  display:flex;
+  flex-shrink:0;
+  gap:6px;
+  align-items: center;
+  justify-content: center;
+  margin-left:auto;
+  justify-self: flex-end;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+  padding: 6px 0;
+  width:278px;
+  height:32px;
+  color: var(--midnight-blue-500);
+  transition: background-color 0.2s;
+  &.edited {
+    width:294px;
+    height:50px;
+    padding: 16px;
+    border-radius: 16px;
+    background-color: var(--brilliant-white);
+  }
+}
+
+.input {
+  width: 100%;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--midnight);
+  &::placeholder{
+    color: var(--midnight-05);
+  }
+  &:focus{
+    outline: none;
+  }
+}

@@ -1,12 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { boardSlice } from './slices';
-import { workspacesSlice } from './slices/workspacesSlice';
+import { boardSlice, workspacesSlice, groupsSlice } from './slices';
+
 import { localStorageMiddleware } from './middleware';
 
 export const store = configureStore({
   reducer: {
     workspaces: workspacesSlice.reducer,
     board: boardSlice.reducer,
+    groups: groupsSlice.reducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware(),

@@ -2,11 +2,13 @@ import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { WorkspaceCardProps } from './WorkspaceCard.types';
 import s from './WorkspaceCard.module.scss';
 import { Edit, Delete } from '../../../../assets/icons';
+import clsx from 'clsx';
 
 export const WorkspaceCard: FC<WorkspaceCardProps> = ({
   edited = false,
   name,
   disabled,
+  active,
   onClick,
   onDelete,
   onEdit,
@@ -18,7 +20,7 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
   const shortcut = name?.[0];
 
   const handleMouseOver = () => {
-    if (!editing) {
+    if (!editing && active) {
       setShowOptions(true);
     }
   };
@@ -56,19 +58,21 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}
       disabled={disabled}
-      className={s.wrapper}
+      className={clsx(s.wrapper, {
+        [s.active]: active,
+      })}
     >
       <div className={s.placeholder}>{shortcut && <span>{shortcut}</span>}</div>
 
       {name && !editing && <span className={s.name}>{name}</span>}
       {showOptions && !editing && (
         <div className={s.options}>
-          <button type="button" onClick={handleEditClick}>
+          <div onClick={handleEditClick}>
             <Edit />
-          </button>
-          <button type="button" onClick={handleDeleteClick}>
+          </div>
+          <div onClick={handleDeleteClick}>
             <Delete />
-          </button>
+          </div>
         </div>
       )}
       {editing && (
@@ -78,6 +82,7 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
           className={s.input}
           onChange={handleInputChange}
           defaultValue={name || undefined}
+          autoFocus
         />
       )}
     </button>

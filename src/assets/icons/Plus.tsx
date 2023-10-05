@@ -6,10 +6,10 @@ export const Plus = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clip-path="url(#a)">
+    <g clipPath="url(#a)">
       <path
         d="M7.833 7.333v-4h1.334v4h4v1.334h-4v4H7.833v-4h-4V7.333h4Z"
-        fill="#001C39"
+        fill="currentColor"
       />
     </g>
     <defs>
