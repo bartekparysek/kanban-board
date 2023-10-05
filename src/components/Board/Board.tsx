@@ -15,7 +15,6 @@ export const Board = () => {
   const groups = useSelector<RootState, GroupType[]>((state) =>
     activeWorkspace ? state.groups[activeWorkspace] : []
   );
-  console.log(groups);
 
   return (
     <div className={s.wrapper}>

@@ -12,7 +12,14 @@ export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
 export const localStorageMiddleware = createListenerMiddleware();
 import { BOARD_KEY, GROUPS_KEY, WORKSPACES_KEY } from '../../config';
 import { setActiveWorkspace } from '../slices/boardSlice';
-import { createGroup, deleteGroup, editGroupName } from '../slices/groupsSlice';
+import {
+  createGroup,
+  deleteGroup,
+  editGroupName,
+  addCard,
+  deleteCard,
+  editCardName,
+} from '../slices/groupsSlice';
 
 localStorageMiddleware.startListening as AppStartListening;
 localStorageMiddleware.startListening({
@@ -39,7 +46,14 @@ localStorageMiddleware.startListening({
 }) as unknown as AppStartListening;
 
 localStorageMiddleware.startListening({
-  matcher: isAnyOf(createGroup, deleteGroup, editGroupName),
+  matcher: isAnyOf(
+    createGroup,
+    deleteGroup,
+    editGroupName,
+    addCard,
+    editCardName,
+    deleteCard
+  ),
   effect: (_, { getState }) => {
     const { groups } = getState() as RootState;
 

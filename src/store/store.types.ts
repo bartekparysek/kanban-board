@@ -14,6 +14,7 @@ export type Groups = {
 };
 
 export type Card = {
+  id: string;
   name: string;
   subCards: Omit<Card, 'subCards'>[];
 };

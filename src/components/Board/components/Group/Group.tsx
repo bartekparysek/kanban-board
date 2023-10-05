@@ -1,18 +1,28 @@
-import { ChangeEvent, FC, useState, KeyboardEvent } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  useState,
+  KeyboardEvent,
+  MouseEvent,
+  useRef,
+} from 'react';
 import { GroupProps } from './Group.types';
 import s from './Group.module.scss';
 import { Plus } from '../../../../assets/icons';
 import { HoverMenu } from '../../../HoverMenu';
 import { useDispatch } from 'react-redux';
-import { deleteGroup, editGroupName } from '../../../../store/slices';
+import { addCard, deleteGroup, editGroupName } from '../../../../store/slices';
+import { Card } from '../Card';
 
 export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
   const [editing, setEditing] = useState(false);
   const [newName, setNewName] = useState('');
   const [showOptions, setShowOptions] = useState(false);
   const dispatch = useDispatch();
+  const cardsListRef = useRef<HTMLDivElement[]>([]);
 
-  const handleMouseOver = () => {
+  const handleMouseOver = (e: MouseEvent) => {
+    e.stopPropagation();
     setShowOptions(true);
   };
 
@@ -49,6 +59,12 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
     }
   };
 
+  const handleAddCard = () => {
+    if (workspaceId) {
+      dispatch(addCard({ workspaceId, groupId: id }));
+    }
+  };
+
   return (
     <div
       className={s.wrapper}
@@ -79,12 +95,20 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
 
       {cards && cards?.length > 0 && (
         <ul>
-          {cards.map((card) => (
-            <li key={card.name}>{card.name}</li>
+          {cards.map((card, i) => (
+            <li key={card.name}>
+              <Card
+                ref={(ref) => (cardsListRef.current[i] = ref!)}
+                {...card}
+                groupId={id}
+                workspaceId={workspaceId}
+                handleHover={handleMouseLeave}
+              />
+            </li>
           ))}
         </ul>
       )}
-      <button className={s.addBtn}>
+      <button className={s.addBtn} onClick={handleAddCard}>
         <Plus />
         Add a card
       </button>
