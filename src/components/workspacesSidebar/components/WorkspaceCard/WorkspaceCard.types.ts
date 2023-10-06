@@ -1,4 +1,5 @@
 export type WorkspaceCardProps = {
+  id: string;
   edited?: boolean;
   name?: string;
   disabled?: boolean;

@@ -6,6 +6,7 @@ import {
   editWorkspace,
   newWorkspace,
   updateWorkspaceName,
+  setWorkspaces,
 } from '../slices/workspacesSlice';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
@@ -27,7 +28,8 @@ localStorageMiddleware.startListening({
     newWorkspace,
     updateWorkspaceName,
     deleteWorkspace,
-    editWorkspace
+    editWorkspace,
+    setWorkspaces
   ),
   effect: (_, { getState }) => {
     const { workspaces } = getState() as RootState;

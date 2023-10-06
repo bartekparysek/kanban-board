@@ -3,10 +3,14 @@ import { WorkspaceCardProps } from './WorkspaceCard.types';
 import s from './WorkspaceCard.module.scss';
 import { Edit, Delete } from '../../../../assets/icons';
 import clsx from 'clsx';
+import { CSS } from '@dnd-kit/utilities';
+import { useSortable } from '@dnd-kit/sortable';
+import { DragHandle } from '../../../../assets/icons/DragHandle';
 
 export const WorkspaceCard: FC<WorkspaceCardProps> = ({
   edited = false,
   name,
+  id,
   disabled,
   active,
   onClick,
@@ -16,6 +20,13 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
 }) => {
   const [editing, setEditing] = useState(edited);
   const [showOptions, setShowOptions] = useState(true);
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
 
   const shortcut = name?.[0];
 
@@ -53,7 +64,9 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
 
   return (
     <button
+      ref={setNodeRef}
       type="button"
+      style={style}
       onClick={onClick}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}
@@ -85,6 +98,10 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
           autoFocus
         />
       )}
+
+      <div {...listeners} {...attributes} className={s.dragHandle}>
+        <DragHandle />
+      </div>
     </button>
   );
 };

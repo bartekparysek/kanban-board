@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux';
 import { HoverMenu } from '../../../HoverMenu';
 
 export const Card = forwardRef<HTMLDivElement, CardProps>(
-  ({ name, groupId, id, workspaceId, handleHover }, ref) => {
+  ({ name, groupId, id, workspaceId }, ref) => {
     const [editing, setEditing] = useState(name.length === 0);
     const [showOptions, setShowOptions] = useState(false);
     const [value, setValue] = useState('');
@@ -22,7 +22,6 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
       e.preventDefault();
       e.stopPropagation();
       if (!editing) {
-        handleHover();
         setShowOptions(true);
       }
     };

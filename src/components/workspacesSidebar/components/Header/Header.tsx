@@ -7,16 +7,30 @@ import {
   editWorkspace,
   newWorkspace,
   updateWorkspaceName,
+  setWorkspaces,
 } from '../../../../store/slices/workspacesSlice';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { Board, Workspace } from '../../../../store/store.types';
 import clsx from 'clsx';
 import { setActiveWorkspace } from '../../../../store/slices';
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 
 export const Header = () => {
   const [editing, setEditing] = useState(false);
-  const [workspaceName, setWorkspaceName] = useState('');
+
   const dispatch = useDispatch();
   const workspaces = useSelector<RootState, Workspace[]>(
     (state) => state.workspaces
@@ -25,8 +39,12 @@ export const Header = () => {
     (state) => state.board.activeWorkspace
   );
 
+  // Edit Workspace
   const editedWorkspace = workspaces.find(
     (workspace) => workspace.edited === true
+  );
+  const [workspaceName, setWorkspaceName] = useState(
+    editedWorkspace?.name ? editedWorkspace?.name : ''
   );
 
   const newWorkspaceCreated = Boolean(
@@ -67,6 +85,23 @@ export const Header = () => {
     dispatch(setActiveWorkspace(id));
   };
 
+  // DND
+  const [list, setList] = useState(workspaces);
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (active.id !== over!.id) {
+      setList((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over!.id);
+
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  };
+
   useEffect(() => {
     if (editedWorkspace) {
       setEditing(true);
@@ -75,14 +110,28 @@ export const Header = () => {
     }
   }, [editedWorkspace]);
 
+  useEffect(() => {
+    dispatch(setWorkspaces(list));
+  }, [dispatch, list]);
+
+  useEffect(() => {
+    setList(workspaces);
+  }, [workspaces]);
+
   return (
     <div className={s.wrapper}>
       {/* List of available workspaces */}
-      <ul className={s.workspacesList}>
-        {workspaces.map(({ id, name, edited, disabled }) => (
-          <li key={id}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={list} strategy={verticalListSortingStrategy}>
+          {list.map(({ id, name, edited, disabled }) => (
             <WorkspaceCard
+              key={id}
               active={id === activeWorkspace}
+              id={id}
               name={name}
               edited={edited}
               disabled={disabled}
@@ -91,9 +140,10 @@ export const Header = () => {
               onDelete={() => handleDeleteWorkspace(id)}
               onEdit={() => handleEditClick(id)}
             />
-          </li>
-        ))}
-      </ul>
+          ))}
+        </SortableContext>
+      </DndContext>
+
       <button
         className={clsx(s.createBtn, {
           [s.editing]: editing,

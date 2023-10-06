@@ -1,21 +1,27 @@
 .wrapper {
   position: relative;
   display: flex;
-  flex:1;
+  flex: 1;
   align-items: center;
   border-radius: 8px;
   background-color: var(--selago);
   width: 100%;
+  margin-bottom: 8px;
   padding: 16px;
-  gap:15px;
-  opacity:0.5;
+  gap: 15px;
+
+  & > :not(.dragHandle) {
+    opacity: 0.5;
+  }
 
   &:disabled {
     cursor: not-allowed;
   }
-  
-  &.active{
-    opacity:1;
+
+  &.active {
+    & > :not(.dragHandle) {
+      opacity: 1;
+    }
     background-color: var(--selago);
   }
 }
@@ -26,13 +32,13 @@
   border-radius: 8px;
   background-color: var(--casper);
   flex-shrink: 0;
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   text-transform: uppercase;
 }
 
-.name{
+.name {
   color: var(--midnight);
   font-size: 13px;
   font-weight: 600;
@@ -40,14 +46,14 @@
 }
 
 .options {
-  right:20px;
+  right: 40px;
   position: absolute;
   display: flex;
   align-items: center;
   justify-content: center;
   justify-self: flex-end;
-  gap:12px;
-  margin-left:15px;
+  gap: 12px;
+  margin-left: 15px;
 }
 
 .input {
@@ -56,10 +62,16 @@
   font-weight: 600;
   line-height: 18px;
   color: var(--midnight);
-  &::placeholder{
+  &::placeholder {
     color: var(--midnight-05);
   }
-  &:focus{
+  &:focus {
     outline: none;
   }
+}
+
+.dragHandle {
+  position: absolute;
+  top: 22px;
+  right: 10px;
 }

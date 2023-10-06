@@ -66,12 +66,12 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
   };
 
   return (
-    <div
-      className={s.wrapper}
-      onMouseOver={handleMouseOver}
-      onMouseLeave={handleMouseLeave}
-    >
-      <div className={s.header}>
+    <div className={s.wrapper}>
+      <div
+        className={s.header}
+        onMouseOver={handleMouseOver}
+        onMouseLeave={handleMouseLeave}
+      >
         {!editing && <p className={s.name}>{name}</p>}
         {editing && (
           <input
@@ -102,7 +102,6 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
                 {...card}
                 groupId={id}
                 workspaceId={workspaceId}
-                handleHover={handleMouseLeave}
               />
             </li>
           ))}
