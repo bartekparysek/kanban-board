@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit';
-import { Groups } from '../store.types';
+import { Group, Groups } from '../store.types';
 import { GROUPS_KEY } from '../../config';
 
 // get data from local storage
@@ -55,57 +55,19 @@ export const groupsSlice = createSlice({
       state[workspaceId] = filteredGroup;
     },
 
-    addCard: (
+    setGroup: (
       state,
       action: PayloadAction<{
         workspaceId: string;
-        groupId: string;
+        group: Group[];
       }>
     ) => {
-      const { workspaceId, groupId } = action.payload;
-      const group = state[workspaceId].find((group) => group.id === groupId);
-      void group?.cards?.push({ id: nanoid(), name: '', subCards: [] });
-    },
+      const { workspaceId, group } = action.payload;
 
-    deleteCard: (
-      state,
-      action: PayloadAction<{
-        workspaceId: string;
-        groupId: string;
-        id: string;
-      }>
-    ) => {
-      const { workspaceId, groupId, id } = action.payload;
-      const group = state[workspaceId].find((group) => group.id === groupId);
-      if (group && group.cards) {
-        group.cards = group?.cards?.filter((card) => card.id !== id);
-      }
-    },
-
-    editCardName: (
-      state,
-      action: PayloadAction<{
-        workspaceId: string;
-        groupId: string;
-        id: string;
-        name: string;
-      }>
-    ) => {
-      const { workspaceId, groupId, id, name } = action.payload;
-      const group = state[workspaceId].find((group) => group.id === groupId);
-      const card = group?.cards?.find((card) => card.id === id);
-      if (card) {
-        card.name = name;
-      }
+      state[workspaceId] = group;
     },
   },
 });
 
-export const {
-  createGroup,
-  deleteGroup,
-  editGroupName,
-  addCard,
-  deleteCard,
-  editCardName,
-} = groupsSlice.actions;
+export const { createGroup, deleteGroup, editGroupName, setGroup } =
+  groupsSlice.actions;

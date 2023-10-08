@@ -6,7 +6,6 @@ export type Board = {
 export type Group = {
   id: string;
   name: string;
-  cards?: Card[];
 };
 
 export type Groups = {
@@ -16,6 +15,7 @@ export type Groups = {
 export type Card = {
   id: string;
   name: string;
+  groupId: string;
   subCards: Omit<Card, 'subCards'>[];
 };
 

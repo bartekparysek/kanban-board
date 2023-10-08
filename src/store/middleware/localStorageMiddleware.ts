@@ -7,20 +7,20 @@ import {
   newWorkspace,
   updateWorkspaceName,
   setWorkspaces,
-} from '../slices/workspacesSlice';
-
-export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
-export const localStorageMiddleware = createListenerMiddleware();
-import { BOARD_KEY, GROUPS_KEY, WORKSPACES_KEY } from '../../config';
-import { setActiveWorkspace } from '../slices/boardSlice';
-import {
   createGroup,
   deleteGroup,
   editGroupName,
-  addCard,
+  setGroup,
+  createCard,
   deleteCard,
   editCardName,
-} from '../slices/groupsSlice';
+  setCards,
+} from '../slices';
+
+export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
+export const localStorageMiddleware = createListenerMiddleware();
+import { BOARD_KEY, CARDS_KEY, GROUPS_KEY, WORKSPACES_KEY } from '../../config';
+import { setActiveWorkspace } from '../slices/boardSlice';
 
 localStorageMiddleware.startListening as AppStartListening;
 localStorageMiddleware.startListening({
@@ -48,17 +48,19 @@ localStorageMiddleware.startListening({
 }) as unknown as AppStartListening;
 
 localStorageMiddleware.startListening({
-  matcher: isAnyOf(
-    createGroup,
-    deleteGroup,
-    editGroupName,
-    addCard,
-    editCardName,
-    deleteCard
-  ),
+  matcher: isAnyOf(createGroup, deleteGroup, editGroupName, setGroup),
   effect: (_, { getState }) => {
     const { groups } = getState() as RootState;
 
     localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
+  },
+}) as unknown as AppStartListening;
+
+localStorageMiddleware.startListening({
+  matcher: isAnyOf(createCard, deleteCard, editCardName, setCards),
+  effect: (_, { getState }) => {
+    const { cards } = getState() as RootState;
+
+    localStorage.setItem(CARDS_KEY, JSON.stringify(cards));
   },
 }) as unknown as AppStartListening;
