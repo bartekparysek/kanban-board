@@ -29,9 +29,8 @@ import {
 } from '@dnd-kit/sortable';
 
 export const Header = () => {
-  const [editing, setEditing] = useState(false);
-
   const dispatch = useDispatch();
+
   const workspaces = useSelector<RootState, Workspace[]>(
     (state) => state.workspaces
   );
@@ -43,9 +42,8 @@ export const Header = () => {
   const editedWorkspace = workspaces.find(
     (workspace) => workspace.edited === true
   );
-  const [workspaceName, setWorkspaceName] = useState(
-    editedWorkspace?.name ? editedWorkspace?.name : ''
-  );
+  const [editing, setEditing] = useState(false);
+  const [workspaceName, setWorkspaceName] = useState('');
 
   const newWorkspaceCreated = Boolean(
     workspaces.find((workspace) => workspace.name === '' && workspace.edited)
@@ -64,6 +62,7 @@ export const Header = () => {
         dispatch(
           updateWorkspaceName({ id: editedWorkspace?.id, name: workspaceName })
         );
+        setWorkspaceName('');
         setEditing(false);
       }
     }
@@ -110,13 +109,22 @@ export const Header = () => {
     }
   }, [editedWorkspace]);
 
+  // Sync with store
   useEffect(() => {
     dispatch(setWorkspaces(list));
   }, [dispatch, list]);
 
+  // Sync store with local state
   useEffect(() => {
     setList(workspaces);
   }, [workspaces]);
+
+  // Prevent disabled save button
+  useEffect(() => {
+    if (editedWorkspace) {
+      setWorkspaceName(editedWorkspace.name);
+    }
+  }, [editedWorkspace]);
 
   return (
     <div className={s.wrapper}>
@@ -147,6 +155,10 @@ export const Header = () => {
       <button
         className={clsx(s.createBtn, {
           [s.editing]: editing,
+          [s.ready]:
+            editing &&
+            workspaceName.length > 0 &&
+            workspaceName !== editedWorkspace?.name,
         })}
         type="button"
         onClick={handleButtonClick}

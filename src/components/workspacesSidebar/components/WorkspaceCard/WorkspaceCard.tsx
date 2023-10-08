@@ -1,11 +1,11 @@
 import { ChangeEvent, FC, useEffect, useState } from 'react';
 import { WorkspaceCardProps } from './WorkspaceCard.types';
 import s from './WorkspaceCard.module.scss';
-import { Edit, Delete } from '../../../../assets/icons';
 import clsx from 'clsx';
 import { CSS } from '@dnd-kit/utilities';
 import { useSortable } from '@dnd-kit/sortable';
 import { DragHandle } from '../../../../assets/icons/DragHandle';
+import { HoverMenu } from '../../../HoverMenu';
 
 export const WorkspaceCard: FC<WorkspaceCardProps> = ({
   edited = false,
@@ -58,35 +58,36 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
     }
   };
 
+  const handleClick = () => {
+    onClick?.();
+    setShowOptions(true);
+  };
+
   useEffect(() => {
     setEditing(edited);
   }, [edited]);
 
   return (
-    <button
+    <div
       ref={setNodeRef}
-      type="button"
       style={style}
-      onClick={onClick}
+      onClick={handleClick}
       onMouseOver={handleMouseOver}
       onMouseLeave={handleMouseLeave}
-      disabled={disabled}
       className={clsx(s.wrapper, {
         [s.active]: active,
+        [s.disabled]: disabled,
       })}
     >
       <div className={s.placeholder}>{shortcut && <span>{shortcut}</span>}</div>
 
       {name && !editing && <span className={s.name}>{name}</span>}
       {showOptions && !editing && (
-        <div className={s.options}>
-          <div onClick={handleEditClick}>
-            <Edit />
-          </div>
-          <div onClick={handleDeleteClick}>
-            <Delete />
-          </div>
-        </div>
+        <HoverMenu
+          onDeleteClick={handleDeleteClick}
+          onEditClick={handleEditClick}
+          className={s.options}
+        />
       )}
       {editing && (
         <input
@@ -102,6 +103,6 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
       <div {...listeners} {...attributes} className={s.dragHandle}>
         <DragHandle />
       </div>
-    </button>
+    </div>
   );
 };
