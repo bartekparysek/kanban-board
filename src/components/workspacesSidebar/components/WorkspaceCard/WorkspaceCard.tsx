@@ -19,7 +19,7 @@ export const WorkspaceCard: FC<WorkspaceCardProps> = ({
   onInput,
 }) => {
   const [editing, setEditing] = useState(edited);
-  const [showOptions, setShowOptions] = useState(true);
+  const [showOptions, setShowOptions] = useState(false);
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id });
 

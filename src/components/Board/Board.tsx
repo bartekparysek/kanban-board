@@ -1,31 +1,200 @@
 import s from './Board.module.scss';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import type {
   Board as BoardType,
   Group as GroupType,
+  Card as CardType,
 } from '../../store/store.types';
 import { NewListButton } from './components/NewListButton/NewListButton';
 import { Group } from './components/Group/Group';
+import {
+  DndContext,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  MeasuringStrategy,
+  DragOverlay,
+} from '@dnd-kit/core';
+import { useEffect, useRef, useState } from 'react';
+import {
+  SortableContext,
+  arrayMove,
+  horizontalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { setGroup, setCardsStore } from '../../store/slices';
+import { Card } from './components/Card';
 
 export const Board = () => {
+  const dispatch = useDispatch();
   const activeWorkspace = useSelector<RootState, BoardType['activeWorkspace']>(
     (state) => state.board.activeWorkspace
   );
-  const groups = useSelector<RootState, GroupType[]>((state) =>
-    activeWorkspace ? state.groups[activeWorkspace] : []
+  const groupsState = useSelector<RootState, GroupType[] | undefined>(
+    (state) => {
+      return activeWorkspace ? state.groups[activeWorkspace] : [];
+    }
   );
+
+  const cardsState = useSelector<RootState, CardType[] | undefined>(
+    (state) => state.cards
+  );
+
+  console.log(cardsState);
+
+  // DND
+  const [groups, setGroups] = useState(groupsState || []);
+  const [cards, setCards] = useState(cardsState || []);
+  const [activeGroup, setActiveGroup] = useState<GroupType | null>(null);
+  const [activeCard, setActiveCard] = useState<CardType | null>(null);
+  const recentlyMovedToNewContainer = useRef(false);
+
+  const sensors = useSensors(useSensor(PointerSensor));
+
+  useEffect(() => {
+    requestAnimationFrame(() => {
+      recentlyMovedToNewContainer.current = false;
+    });
+  }, [groups]);
+
+  // Sync with localStorage
+  useEffect(() => {
+    if (activeWorkspace && groups) {
+      dispatch(setGroup({ workspaceId: activeWorkspace, group: groups }));
+    }
+  }, [activeWorkspace, dispatch, groups]);
+
+  useEffect(() => {
+    if (cards) {
+      dispatch(setCardsStore(cards));
+    }
+  }, [dispatch, cards]);
+
+  // Sync with store
+  useEffect(() => {
+    setGroups(groupsState || []);
+  }, [groupsState]);
+
+  useEffect(() => {
+    setCards(cardsState || []);
+  }, [cardsState]);
 
   return (
     <div className={s.wrapper}>
       <ul className={s.list}>
-        {groups &&
-          groups.length > 0 &&
-          groups.map((el) => (
-            <li key={el.id}>
-              <Group {...el} workspaceId={activeWorkspace} />
-            </li>
-          ))}
+        <DndContext
+          sensors={sensors}
+          // collisionDetection={collisionDetectionStrategy}
+          measuring={{
+            droppable: {
+              strategy: MeasuringStrategy.Always,
+            },
+          }}
+          onDragStart={({ active }) => {
+            if (active.data.current?.type === 'Group') {
+              setActiveGroup(active.data.current.group);
+              return;
+            }
+
+            if (active.data.current?.type === 'Card') {
+              setActiveCard(active.data.current.card);
+              return;
+            }
+          }}
+          onDragOver={({ active, over }) => {
+            if (!over) return;
+
+            const activeId = active.id as string;
+            const overId = over.id as string;
+
+            if (activeId === overId) return;
+
+            const isActiveACard = active.data.current?.type === 'Card';
+            const isOverACard = over.data.current?.type === 'Card';
+
+            if (!isActiveACard) return;
+            // Dropping card over card in the same group
+            if (isActiveACard && isOverACard) {
+              setCards((cards) => {
+                const activeIndex = cards.findIndex(
+                  (card) => card.id === activeId
+                );
+                const overIndex = cards.findIndex((card) => card.id === overId);
+
+                if (cards[activeIndex].groupId != cards[overIndex].groupId) {
+                  const newCards = cards.map((card) =>
+                    card.id === activeId
+                      ? {
+                          ...card,
+                          groupId: cards[overIndex].groupId,
+                        }
+                      : card
+                  );
+                  return arrayMove(newCards, activeIndex, overIndex - 1);
+                }
+
+                return arrayMove(cards, activeIndex, overIndex);
+              });
+            }
+            const isOverAGroup = over.data.current?.type === 'Group';
+
+            // Dropping a Card over a Group
+            if (isActiveACard && isOverAGroup) {
+              setCards((cards) => {
+                const activeIndex = cards.findIndex((t) => t.id === activeId);
+
+                const newCards = cards.map((card) =>
+                  card.id === activeId
+                    ? {
+                        ...card,
+                        groupId: overId,
+                      }
+                    : card
+                );
+
+                return arrayMove(newCards, activeIndex, activeIndex);
+              });
+            }
+          }}
+          onDragEnd={({ active, over }) => {
+            setActiveGroup(null);
+            setActiveCard(null);
+            if (
+              active.id !== over!.id &&
+              active.data?.current?.type === 'Group'
+            ) {
+              setGroups((items) => {
+                const oldIndex = items.findIndex(
+                  (item) => item.id === active.id
+                );
+                const newIndex = items.findIndex(
+                  (item) => item.id === over!.id
+                );
+
+                return arrayMove(items, oldIndex, newIndex);
+              });
+            }
+          }}
+        >
+          <SortableContext
+            items={groups || []}
+            strategy={horizontalListSortingStrategy}
+          >
+            {groups &&
+              groups.length > 0 &&
+              groups.map((props) => (
+                <Group
+                  key={props.id}
+                  {...props}
+                  workspaceId={activeWorkspace}
+                  cards={cards.filter((card) => card.groupId === props.id)}
+                />
+              ))}
+          </SortableContext>
+          <DragOverlay>
+            {activeCard ? <Card {...activeCard} /> : null}
+          </DragOverlay>
+        </DndContext>
       </ul>
       <NewListButton workspace={activeWorkspace} />
     </div>

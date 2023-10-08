@@ -14,7 +14,7 @@ import {
   createCard,
   deleteCard,
   editCardName,
-  setCards,
+  setCardsStore,
 } from '../slices';
 
 export type AppStartListening = TypedStartListening<RootState, AppDispatch>;
@@ -57,7 +57,7 @@ localStorageMiddleware.startListening({
 }) as unknown as AppStartListening;
 
 localStorageMiddleware.startListening({
-  matcher: isAnyOf(createCard, deleteCard, editCardName, setCards),
+  matcher: isAnyOf(createCard, deleteCard, editCardName, setCardsStore),
   effect: (_, { getState }) => {
     const { cards } = getState() as RootState;
 

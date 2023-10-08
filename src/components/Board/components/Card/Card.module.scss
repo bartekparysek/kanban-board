@@ -34,6 +34,12 @@ input {
 
 .options {
   right: 0;
-  margin-right: 16px;
+  margin-right: 25px;
   position: relative;
+}
+
+.dragHandle {
+  position: absolute;
+  top: 14px;
+  right: 10px;
 }

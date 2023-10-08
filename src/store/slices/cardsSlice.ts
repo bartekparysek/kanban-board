@@ -39,11 +39,11 @@ export const cardsSlice = createSlice({
       return state.filter((card) => card.id !== action.payload);
     },
 
-    setCards: (state, action: PayloadAction<Card[]>) => {
+    setCardsStore: (state, action: PayloadAction<Card[]>) => {
       return (state = action.payload);
     },
   },
 });
 
-export const { createCard, setCards, deleteCard, editCardName } =
+export const { createCard, setCardsStore, deleteCard, editCardName } =
   cardsSlice.actions;
