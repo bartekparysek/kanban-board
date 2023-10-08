@@ -36,8 +36,8 @@ export const workspacesSlice = createSlice({
           : { ...workspace, disabled: false }
       );
     },
-    setWorkspaces: (state, action: PayloadAction<Workspace[]>) => {
-      return (state = action.payload);
+    setWorkspaces: (_state, action: PayloadAction<Workspace[]>) => {
+      return action.payload;
     },
   },
 });

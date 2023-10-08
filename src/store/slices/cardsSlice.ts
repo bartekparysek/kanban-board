@@ -39,8 +39,8 @@ export const cardsSlice = createSlice({
       return state.filter((card) => card.id !== action.payload);
     },
 
-    setCardsStore: (state, action: PayloadAction<Card[]>) => {
-      return (state = action.payload);
+    setCardsStore: (_state, action: PayloadAction<Card[]>) => {
+      return action.payload;
     },
   },
 });
