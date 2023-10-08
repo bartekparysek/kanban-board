@@ -194,7 +194,7 @@ export const Board = () => {
           )}
         </DndContext>
       </ul>
-      <NewListButton workspace={activeWorkspace} />
+      {activeWorkspace && <NewListButton workspace={activeWorkspace} />}
     </div>
   );
 };

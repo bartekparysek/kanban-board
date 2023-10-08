@@ -126,6 +126,12 @@ export const Header = () => {
     }
   }, [editedWorkspace]);
 
+  useEffect(() => {
+    if (workspaces.length === 0) {
+      dispatch(setActiveWorkspace(''));
+    }
+  }, [dispatch, workspaces]);
+
   return (
     <div className={s.wrapper}>
       {/* List of available workspaces */}
