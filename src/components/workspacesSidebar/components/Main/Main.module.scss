@@ -1,0 +1,26 @@
+.main {
+  padding: 8px;
+  flex-grow: 1;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.element {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  color: var(--submarine);
+  font-size: 13px;
+  font-weight: 600;
+  &.boards {
+    color: var(--azure-radiance);
+  }
+  &:first-child {
+    margin-top: 3px;
+  }
+}
