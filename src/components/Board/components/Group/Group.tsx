@@ -1,4 +1,11 @@
-import { ChangeEvent, FC, useState, KeyboardEvent, MouseEvent } from 'react';
+import {
+  ChangeEvent,
+  FC,
+  useState,
+  KeyboardEvent,
+  MouseEvent,
+  useRef,
+} from 'react';
 import { GroupProps } from './Group.types';
 import s from './Group.module.scss';
 import { Plus } from '../../../../assets/icons';
@@ -22,15 +29,22 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
   const [editing, setEditing] = useState(false);
   const [newName, setNewName] = useState('');
   const [showOptions, setShowOptions] = useState(false);
+  const detailsRef = useRef<HTMLDivElement>(null!);
   const dispatch = useDispatch();
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id,
-      data: {
-        type: 'Group',
-        group: { id, name, cards, workspaceId },
-      },
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+    data: {
+      type: 'Group',
+      group: { id, name, cards, workspaceId },
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -81,9 +95,20 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
     }
   };
 
+  if (isDragging) {
+    return (
+      <div ref={setNodeRef} style={style}>
+        <div
+          className={s.dragging}
+          style={{ height: `${detailsRef?.current?.offsetHeight}px` }}
+        />
+      </div>
+    );
+  }
+
   return (
     <li ref={setNodeRef} style={style}>
-      <div className={s.wrapper}>
+      <div className={s.wrapper} ref={detailsRef}>
         <div
           className={s.header}
           onMouseOver={handleMouseOver}
@@ -120,7 +145,7 @@ export const Group: FC<GroupProps> = ({ id, name, cards, workspaceId }) => {
             <ul className={s.list}>
               {cards.map((card) => (
                 <li key={card.id}>
-                  <Card {...card} workspaceId={workspaceId} />
+                  <Card {...card} />
                 </li>
               ))}
             </ul>

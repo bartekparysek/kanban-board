@@ -115,8 +115,10 @@ i {
 }
 
 ol,
-ul {
+ul,
+li {
   list-style: none;
+  list-style-type: none;
 }
 
 table {

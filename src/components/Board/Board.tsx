@@ -13,10 +13,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  MeasuringStrategy,
   DragOverlay,
 } from '@dnd-kit/core';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   SortableContext,
   arrayMove,
@@ -24,6 +23,7 @@ import {
 } from '@dnd-kit/sortable';
 import { setGroup, setCardsStore } from '../../store/slices';
 import { Card } from './components/Card';
+import { createPortal } from 'react-dom';
 
 export const Board = () => {
   const dispatch = useDispatch();
@@ -40,29 +40,20 @@ export const Board = () => {
     (state) => state.cards
   );
 
-  console.log(cardsState);
-
   // DND
   const [groups, setGroups] = useState(groupsState || []);
   const [cards, setCards] = useState(cardsState || []);
   const [activeGroup, setActiveGroup] = useState<GroupType | null>(null);
   const [activeCard, setActiveCard] = useState<CardType | null>(null);
-  const recentlyMovedToNewContainer = useRef(false);
-
   const sensors = useSensors(useSensor(PointerSensor));
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      recentlyMovedToNewContainer.current = false;
-    });
-  }, [groups]);
 
   // Sync with localStorage
   useEffect(() => {
     if (activeWorkspace && groups) {
-      dispatch(setGroup({ workspaceId: activeWorkspace, group: groups }));
+      dispatch(setGroup({ workspaceId: activeWorkspace, groups: groups }));
     }
-  }, [activeWorkspace, dispatch, groups]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, groups]);
 
   useEffect(() => {
     if (cards) {
@@ -84,12 +75,6 @@ export const Board = () => {
       <ul className={s.list}>
         <DndContext
           sensors={sensors}
-          // collisionDetection={collisionDetectionStrategy}
-          measuring={{
-            droppable: {
-              strategy: MeasuringStrategy.Always,
-            },
-          }}
           onDragStart={({ active }) => {
             if (active.data.current?.type === 'Group') {
               setActiveGroup(active.data.current.group);
@@ -191,9 +176,22 @@ export const Board = () => {
                 />
               ))}
           </SortableContext>
-          <DragOverlay>
-            {activeCard ? <Card {...activeCard} /> : null}
-          </DragOverlay>
+
+          {createPortal(
+            <DragOverlay>
+              {activeGroup && (
+                <Group
+                  {...activeGroup}
+                  workspaceId={activeWorkspace}
+                  cards={cards.filter(
+                    (card) => card.groupId === activeGroup.id
+                  )}
+                />
+              )}
+              {activeCard && <Card {...activeCard} />}
+            </DragOverlay>,
+            document.body
+          )}
         </DndContext>
       </ul>
       <NewListButton workspace={activeWorkspace} />

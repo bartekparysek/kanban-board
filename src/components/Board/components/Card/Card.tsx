@@ -14,14 +14,20 @@ export const Card: FC<CardProps> = ({ name, groupId, id }) => {
   const [value, setValue] = useState('');
   const dispatch = useDispatch();
 
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id,
-      data: {
-        type: 'Card',
-        card: { id, name, groupId },
-      },
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id,
+    data: {
+      type: 'Card',
+      card: { id, name, groupId },
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -41,9 +47,7 @@ export const Card: FC<CardProps> = ({ name, groupId, id }) => {
   };
 
   const handleDeleteCard = () => {
-    if (workspaceId) {
-      dispatch(deleteCard(id));
-    }
+    dispatch(deleteCard(id));
   };
 
   const handleEditCardName = () => {
@@ -66,6 +70,10 @@ export const Card: FC<CardProps> = ({ name, groupId, id }) => {
       setEditing(false);
     }
   };
+
+  if (isDragging) {
+    return <div className={s.dragging} />;
+  }
 
   return (
     <div

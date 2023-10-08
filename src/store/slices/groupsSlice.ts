@@ -59,12 +59,12 @@ export const groupsSlice = createSlice({
       state,
       action: PayloadAction<{
         workspaceId: string;
-        group: Group[];
+        groups: Group[];
       }>
     ) => {
-      const { workspaceId, group } = action.payload;
+      const { workspaceId, groups } = action.payload;
 
-      state[workspaceId] = group;
+      void (state[workspaceId] = groups);
     },
   },
 });

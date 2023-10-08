@@ -61,3 +61,10 @@
   margin-left: auto;
   justify-self: end;
 }
+
+.dragging {
+  background-color: var(--brilliant-white);
+  border-radius: 16px;
+  opacity: 0.8;
+  width: 294px;
+}
