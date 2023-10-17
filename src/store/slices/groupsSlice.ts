@@ -1,6 +1,12 @@
-import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit';
+import {
+  PayloadAction,
+  createSelector,
+  createSlice,
+  nanoid,
+} from '@reduxjs/toolkit';
 import { Group, Groups } from '../store.types';
 import { GROUPS_KEY } from '../../config';
+import { RootState } from '../store';
 
 // get data from local storage
 const initialState: Groups = JSON.parse(
@@ -71,3 +77,11 @@ export const groupsSlice = createSlice({
 
 export const { createGroup, deleteGroup, editGroupName, setGroup } =
   groupsSlice.actions;
+
+const groups = (state: RootState) => state.groups;
+const activeWorkspace = (state: RootState) => state.board.activeWorkspace;
+
+export const activeGroupsSelector = createSelector(
+  [groups, activeWorkspace],
+  (groups, activeWorkspace) => (activeWorkspace ? groups[activeWorkspace] : [])
+);

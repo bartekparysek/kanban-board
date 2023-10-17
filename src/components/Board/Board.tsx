@@ -21,7 +21,11 @@ import {
   arrayMove,
   horizontalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { setGroup, setCardsStore } from '../../store/slices';
+import {
+  setGroup,
+  setCardsStore,
+  activeGroupsSelector,
+} from '../../store/slices';
 import { Card } from './components/Card';
 import { createPortal } from 'react-dom';
 
@@ -30,10 +34,9 @@ export const Board = () => {
   const activeWorkspace = useSelector<RootState, BoardType['activeWorkspace']>(
     (state) => state.board.activeWorkspace
   );
+
   const groupsState = useSelector<RootState, GroupType[] | undefined>(
-    (state) => {
-      return activeWorkspace ? state.groups[activeWorkspace] : [];
-    }
+    activeGroupsSelector
   );
 
   const cardsState = useSelector<RootState, CardType[] | undefined>(
