@@ -7,6 +7,7 @@ import {
 import { Group, Groups } from '../store.types';
 import { GROUPS_KEY } from '../../config';
 import { RootState } from '../store';
+import { activeWorkspace } from './boardSlice';
 
 // get data from local storage
 const initialState: Groups = JSON.parse(
@@ -79,7 +80,6 @@ export const { createGroup, deleteGroup, editGroupName, setGroup } =
   groupsSlice.actions;
 
 const groups = (state: RootState) => state.groups;
-const activeWorkspace = (state: RootState) => state.board.activeWorkspace;
 
 export const activeGroupsSelector = createSelector(
   [groups, activeWorkspace],

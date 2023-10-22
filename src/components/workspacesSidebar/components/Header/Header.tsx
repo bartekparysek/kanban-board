@@ -8,12 +8,16 @@ import {
   newWorkspace,
   updateWorkspaceName,
   setWorkspaces,
+  workspacesSelector,
 } from '../../../../store/slices/workspacesSlice';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { Board, Workspace } from '../../../../store/store.types';
 import clsx from 'clsx';
-import { setActiveWorkspace } from '../../../../store/slices';
+import {
+  activeWorkspaceSelector,
+  setActiveWorkspace,
+} from '../../../../store/slices';
 import {
   DndContext,
   DragEndEvent,
@@ -31,11 +35,10 @@ import {
 export const Header = () => {
   const dispatch = useDispatch();
 
-  const workspaces = useSelector<RootState, Workspace[]>(
-    (state) => state.workspaces
-  );
+  const workspaces = useSelector<RootState, Workspace[]>(workspacesSelector);
+
   const activeWorkspace = useSelector<RootState, Board['activeWorkspace']>(
-    (state) => state.board.activeWorkspace
+    activeWorkspaceSelector
   );
 
   // Edit Workspace

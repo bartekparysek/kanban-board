@@ -1,6 +1,12 @@
-import { PayloadAction, createSlice, nanoid } from '@reduxjs/toolkit';
+import {
+  PayloadAction,
+  createSlice,
+  nanoid,
+  createSelector,
+} from '@reduxjs/toolkit';
 import { Workspace } from '../store.types';
 import { WORKSPACES_KEY } from '../../config';
+import { RootState } from '../store';
 
 const initialState: Workspace[] = JSON.parse(
   localStorage.getItem(WORKSPACES_KEY) ?? '[]'
@@ -49,3 +55,10 @@ export const {
   editWorkspace,
   setWorkspaces,
 } = workspacesSlice.actions;
+
+const workspaces = (state: RootState) => state.workspaces;
+
+export const workspacesSelector = createSelector(
+  [workspaces],
+  (workspaces) => workspaces
+);
