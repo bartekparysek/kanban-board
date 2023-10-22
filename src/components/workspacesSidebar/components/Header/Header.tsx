@@ -1,4 +1,3 @@
-import { Plus, Check } from '../../../../assets/icons';
 import s from './Header.module.scss';
 import { WorkspaceCard } from '../WorkspaceCard';
 import { RootState } from '../../../../store/store';
@@ -9,11 +8,11 @@ import {
   updateWorkspaceName,
   setWorkspaces,
   workspacesSelector,
+  editedWorkspaceSelector,
 } from '../../../../store/slices/workspacesSlice';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import type { Board, Workspace } from '../../../../store/store.types';
-import clsx from 'clsx';
 import {
   activeWorkspaceSelector,
   setActiveWorkspace,
@@ -31,24 +30,27 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
+import { WorkspacesButton } from '../WorkspacesButton';
 
 export const Header = () => {
   const dispatch = useDispatch();
-
   const workspaces = useSelector<RootState, Workspace[]>(workspacesSelector);
-
   const activeWorkspace = useSelector<RootState, Board['activeWorkspace']>(
     activeWorkspaceSelector
   );
-
   // Edit Workspace
-  const editedWorkspace = workspaces.find(
-    (workspace) => workspace.edited === true
+  const editedWorkspace = useSelector<RootState, Workspace | undefined>(
+    editedWorkspaceSelector
   );
   const [editing, setEditing] = useState(false);
   const [workspaceName, setWorkspaceName] = useState('');
 
-  const newWorkspaceCreated = Boolean(
+  const isButtonReady =
+    editing &&
+    workspaceName.length > 0 &&
+    workspaceName !== editedWorkspace?.name;
+
+  const isNewWorkspace = Boolean(
     workspaces.find((workspace) => workspace.name === '' && workspace.edited)
   );
 
@@ -57,17 +59,21 @@ export const Header = () => {
     setEditing(true);
   };
 
+  const handleSaveWorkspaceName = () => {
+    if (workspaceName.length > 0 && editedWorkspace) {
+      dispatch(
+        updateWorkspaceName({ id: editedWorkspace?.id, name: workspaceName })
+      );
+      setWorkspaceName('');
+      setEditing(false);
+    }
+  };
+
   const handleButtonClick = () => {
     if (!editing) {
       handleCreateWorkspace();
     } else {
-      if (workspaceName.length > 0 && editedWorkspace) {
-        dispatch(
-          updateWorkspaceName({ id: editedWorkspace?.id, name: workspaceName })
-        );
-        setWorkspaceName('');
-        setEditing(false);
-      }
+      handleSaveWorkspaceName();
     }
   };
 
@@ -161,29 +167,12 @@ export const Header = () => {
         </SortableContext>
       </DndContext>
 
-      <button
-        className={clsx(s.createBtn, {
-          [s.editing]: editing,
-          [s.ready]:
-            editing &&
-            workspaceName.length > 0 &&
-            workspaceName !== editedWorkspace?.name,
-        })}
-        type="button"
+      <WorkspacesButton
+        editing={editing}
         onClick={handleButtonClick}
-      >
-        {!editing ? (
-          <>
-            <Plus />
-            Create Workspace
-          </>
-        ) : (
-          <>
-            <Check />
-            {newWorkspaceCreated ? 'Save new workspace' : 'Save workspace'}
-          </>
-        )}
-      </button>
+        ready={isButtonReady}
+        isNewWorkspace={isNewWorkspace}
+      />
     </div>
   );
 };

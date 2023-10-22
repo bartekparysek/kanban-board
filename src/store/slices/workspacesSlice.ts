@@ -62,3 +62,8 @@ export const workspacesSelector = createSelector(
   [workspaces],
   (workspaces) => workspaces
 );
+
+export const editedWorkspaceSelector = createSelector(
+  [workspaces],
+  (workspaces) => workspaces.find((workspace) => workspace.edited === true)
+);
